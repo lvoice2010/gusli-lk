@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+
+  /* Тёмная тема (по умолчанию) — графитово-серая, не чёрная. Каналы RGB для alpha-модификаторов */
+  --ink-900: 24 26 33; /* фон страницы */
+  --ink-800: 30 33 41; /* сайдбар / шапка */
+  --ink-700: 37 41 51; /* карточки */
+  --ink-600: 45 50 61; /* мягкая поверхность / ховер */
+  --ink-500: 53 59 72; /* трек прогресса */
+  --line: 60 66 79;
+  --fg: 233 235 242;
+  --muted: 156 162 175;
+  --faint: 116 123 137;
+  --scroll-thumb: #3b414e;
+}
+
+:root[data-theme="light"] {
+  /* Светлая тема */
+  --ink-900: 244 245 248; /* фон страницы */
+  --ink-800: 255 255 255; /* сайдбар / шапка */
+  --ink-700: 255 255 255; /* карточки */
+  --ink-600: 248 249 251; /* мягкая поверхность */
+  --ink-500: 235 238 243; /* трек прогресса */
+  --line: 224 227 233;
+  --fg: 17 22 34;
+  --muted: 82 89 105;
+  --faint: 130 137 153;
+  --scroll-thumb: #c7cdd8;
+}
+
+/* Светлая тема: сайдбар остаётся тёмно-серым, чтобы отличаться от основного поля.
+   Переопределяем поверхности/текст только внутри сайдбара — содержимое читается как на тёмной теме. */
+:root[data-theme="light"] .sidebar {
+  --ink-900: 17 19 24;
+  --ink-800: 30 33 41; /* тёмно-серый фон сайдбара */
+  --ink-700: 38 42 51; /* карточка профиля */
+  --ink-600: 47 52 63; /* ховер пунктов меню */
+  --ink-500: 47 52 63;
+  --line: 55 61 73;
+  --fg: 236 238 243;
+  --muted: 167 173 186;
+  --faint: 124 131 145;
+}
+
+html,
+body {
+  background-color: rgb(var(--ink-900));
+  color: rgb(var(--fg));
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Тонкий скролл */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+  border: 2px solid rgb(var(--ink-900));
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl2 border border-line bg-ink-700/70 p-5 shadow-card backdrop-blur-sm;
+  }
+  .card-title {
+    @apply text-sm font-medium text-muted;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-xs font-medium;
+  }
+  .gradient-text {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-brand-gradient text-white hover:opacity-90;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-ink-600/60 text-muted hover:text-white hover:border-brand-purple/50;
+  }
+}
+
+/* Печать отчёта (PDF): убираем навигацию и фон, печатаем содержимое дашборда */
+@media print {
+  aside,
+  header {
+    display: none !important;
+  }
+  .pl-64 {
+    padding-left: 0 !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+  .card {
+    border-color: #e5e7eb !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
