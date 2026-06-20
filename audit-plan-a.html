@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>План А — аудит вместо сокращений</title>
+<style>
+  :root{
+    --bg:#0a0a1a;
+    --bg2:#0e1230;
+    --card:#13183a;
+    --card2:#171d4a;
+    --line:rgba(255,255,255,.08);
+    --txt:#eef0ff;
+    --muted:#9aa0c8;
+    --violet:#8b5cf6;
+    --blue:#3b82f6;
+    --cyan:#22d3ee;
+    --green:#34d399;
+    --red:#fb7185;
+    --amber:#fbbf24;
+    --grad:linear-gradient(100deg,#8b5cf6,#3b82f6 55%,#22d3ee);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(139,92,246,.18),transparent 60%),
+      radial-gradient(1000px 600px at 0% 10%,rgba(34,211,238,.10),transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  section{padding:64px 0}
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--cyan);font-weight:600;
+    border:1px solid var(--line);border-radius:999px;
+    padding:7px 16px;background:rgba(34,211,238,.06);
+  }
+  h1{font-size:clamp(34px,6vw,62px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:22px 0 18px}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:clamp(17px,2.4vw,22px);color:var(--muted);max-width:760px}
+  h2{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  h2 .sub{display:block;font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin-bottom:12px}
+
+  /* wave */
+  .wave{height:3px;width:100%;margin:54px 0 0;border-radius:3px;
+    background:var(--grad);opacity:.55;
+    mask:repeating-linear-gradient(90deg,#000 0 8px,transparent 8px 14px);}
+
+  /* hero reframe */
+  .reframe{
+    margin-top:48px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(180deg,rgba(139,92,246,.10),rgba(34,211,238,.04));
+    padding:34px 34px;
+  }
+  .reframe p{font-size:clamp(19px,2.6vw,26px);font-weight:700;letter-spacing:-.01em}
+  .reframe .small{font-size:16px;font-weight:500;color:var(--muted);margin-top:12px}
+
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:34px}
+  .card{
+    border:1px solid var(--line);border-radius:18px;background:var(--card);
+    padding:24px 24px 26px;position:relative;overflow:hidden;
+  }
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--grad);opacity:.8}
+  .card .num{font-size:42px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .card .num.red{color:var(--red)} .card .num.amber{color:var(--amber)} .card .num.cyan{color:var(--cyan)} .card .num.violet{color:var(--violet)}
+  .card h3{font-size:18px;font-weight:700;margin:6px 0 8px}
+  .card p{font-size:14.5px;color:var(--muted)}
+  .card .tag{display:inline-block;margin-top:14px;font-size:12px;font-weight:600;color:var(--txt);
+    background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+
+  /* plan table */
+  .plan{margin-top:30px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card)}
+  .scroller{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:620px}
+  th,td{text-align:left;padding:16px 18px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:top}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;background:rgba(255,255,255,.02)}
+  tr:last-child td{border-bottom:none}
+  td .dir{font-weight:700;color:var(--txt)}
+  .owner{display:inline-block;font-weight:600;color:var(--cyan);background:rgba(34,211,238,.08);border:1px solid var(--line);border-radius:8px;padding:3px 10px;font-size:13px}
+
+  /* compare */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:30px}
+  .col{border:1px solid var(--line);border-radius:18px;padding:26px}
+  .col.b{background:rgba(251,113,133,.05)}
+  .col.a{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.25)}
+  .col .label{font-size:13px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+  .col.b .label{color:var(--red)} .col.a .label{color:var(--green)}
+  .col h4{font-size:21px;font-weight:800;margin:8px 0 16px;letter-spacing:-.01em}
+  .col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .col li{display:flex;gap:11px;font-size:15px;color:#d7dbf5}
+  .col li .ic{flex:none;width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:13px;font-weight:800;margin-top:1px}
+  .col.b li .ic{background:rgba(251,113,133,.16);color:var(--red)}
+  .col.a li .ic{background:rgba(52,211,153,.16);color:var(--green)}
+
+  /* close */
+  .close{border:1px solid var(--line);border-radius:22px;padding:44px 36px;margin-top:30px;text-align:center;
+    background:linear-gradient(180deg,rgba(139,92,246,.12),rgba(34,211,238,.05))}
+  .close h2{margin-bottom:14px}
+  .ask{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-.01em;margin:6px auto 0;max-width:740px}
+  .ask .grad{font-weight:800}
+  .closenote{color:var(--muted);font-size:16px;margin-top:18px;max-width:620px;margin-left:auto;margin-right:auto}
+
+  footer{padding:30px 0 56px;text-align:center;color:var(--muted);font-size:13px}
+  .note{font-size:12.5px;color:#6e74a0;margin-top:6px}
+
+  @media(max-width:720px){
+    .grid{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    section{padding:46px 0}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="wrap" style="padding-top:74px">
+  <span class="kicker">🪿 Внутренний аудит · своими силами · 0 ₽ на стороне</span>
+  <h1>План А: <span class="grad">найти деньги,<br>которые мы уже теряем</span></h1>
+  <p class="lead">Альтернатива сокращению штата. Мы не режем мощность — мы возвращаем выручку, которая уже у нас под рукой, но утекает мимо.</p>
+
+  <div class="reframe">
+    <p>Сокращение исходит из мысли «нас стало много». Но цифры говорят другое:<br>у нас <span class="grad">не проблема лишних людей — у нас проблема упущенной выручки</span>.</p>
+    <p class="small">А значит сокращение лечит симптом. По жёлтой группе — даже усугубляет: меньше людей при сервисе 45% = сервис падает ещё ниже.</p>
+  </div>
+  <div class="wave"></div>
+</section>
+
+<!-- SIGNALS -->
+<section class="wrap">
+  <h2><span class="sub">Четыре сигнала</span>Где утекают деньги прямо сейчас</h2>
+  <div class="grid">
+
+    <div class="card">
+      <div class="num red">−25%</div>
+      <h3>Отток клиентов</h3>
+      <p>20 ушедших из 80 за год. Такой процент — не случайность, а системная ошибка. Гипотеза: перестали показывать ценность — клиент видит только счета, а в ЛК заходит ~10%. «Уходят» = не увидели ценности, которую мы не донесли.</p>
+      <span class="tag">Аудит: от каких менеджеров уходят · число коммуникаций · видна ли ценность</span>
+    </div>
+
+    <div class="card">
+      <div class="num amber">45%</div>
+      <h3>Жёлтая группа — низкий сервис</h3>
+      <p>Сервис по Зенкому ~45%: больше половины обращений, за которые <b>уже готовы платить</b>, мы теряем. Продавать ничего не надо — объём есть. Проблема тянется с ноября: если живёт полгода — методы решения не работают.</p>
+      <span class="tag">Аудит: тайный покупатель (ученик Сергей) → как реально обучают</span>
+    </div>
+
+    <div class="card">
+      <div class="num cyan">50<span style="font-size:24px">%</span> <span style="font-size:20px;color:var(--muted)">vs 70–75%</span></div>
+      <h3>Занятость операторов</h3>
+      <p>В среднем 50%, иногда ниже — против отраслевой нормы 70–75%. Другие этого добиваются, мы — нет. В эту сторону мы вообще никогда не смотрели.</p>
+    </div>
+
+    <div class="card">
+      <div class="num violet">19 vs 3</div>
+      <h3>Нагрузка менеджеров</h3>
+      <p>Головина (ИТМ) — 19 проектов, почти все в запуске, с ежедневными отчётами, скрипты и интеграции настраивает сама. Лунькин — 3 проекта. У ОКСа — 4–15 без ежедневных отчётов. Методологии оценки нагрузки нет — значит решение «кого сократить» сейчас вслепую.</p>
+      <span class="tag">Аудит: почасовой хронометраж дня (как уже делали по ОП и ИТМ)</span>
+    </div>
+
+  </div>
+  <p class="note">* Цифры по сервису и оттоку — подставить точные перед показом.</p>
+</section>
+
+</body>
+</html>

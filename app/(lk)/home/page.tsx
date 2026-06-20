@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Topbar } from "@/components/Topbar";
+import { QuarterReportDemo } from "@/components/widgets/QuarterReportDemo";
+import { ConnectModal } from "@/components/widgets/ConnectModal";
 import { PulseDot } from "@/components/PulseDot";
 import { CONNECTED_ASSISTANTS, CLIENT } from "@/lib/mock";
 import { fmtNumber, fmtDuration } from "@/lib/format";
 import {
-  IconWarn,
-  IconInfo,
-  IconCheckCircle,
   IconWave,
   IconClock,
   IconArrowRight,
@@ -17,26 +16,6 @@ import {
   IconMail,
   IconAssistant,
 } from "@/components/icons";
-
-// ── Уведомления (демо) ──
-const NOTIFICATIONS = [
-  {
-    id: "n1",
-    kind: "warn" as const,
-    text: "Пик нагрузки 09.06 13:00–14:00 — ассистент принял 142 обращения. Рекомендуем проверить сценарий пиковых часов.",
-  },
-  {
-    id: "n2",
-    kind: "info" as const,
-    text: "Новая тематика обращений: «банкеты» — +9% за неделю.",
-    tag: "Скоро",
-  },
-  {
-    id: "n3",
-    kind: "ok" as const,
-    text: "Ежемесячный отчёт за май готов.",
-  },
-];
 
 // ── Рекомендации ──
 const RECS = [
@@ -55,37 +34,18 @@ const RECS = [
     cta: "Попробовать",
     Icon: IconWave,
     accent: "#22d3ee",
+    demo: true,
   },
 ];
 
 export default function HomePage() {
-  const [dismissed, setDismissed] = useState<string[]>([]);
-  const notes = NOTIFICATIONS.filter((n) => !dismissed.includes(n.id));
-
+  const [demo, setDemo] = useState(false);
+  const [connect, setConnect] = useState<string | null>(null);
   return (
     <>
       <Topbar title="Главная" subtitle={CLIENT.company} />
 
       <div className="space-y-8 p-6">
-        {/* ── Уведомления ── */}
-        <section>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-fg">Уведомления</h2>
-            <button className="flex items-center gap-1 text-sm font-medium text-brand-purple hover:text-brand-cyan">
-              Все уведомления <IconArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-          {notes.length ? (
-            <div className="grid gap-3 md:grid-cols-3">
-              {notes.map((n) => (
-                <NotificationCard key={n.id} n={n} onClose={() => setDismissed((d) => [...d, n.id])} />
-              ))}
-            </div>
-          ) : (
-            <div className="card text-sm text-faint">Новых уведомлений нет.</div>
-          )}
-        </section>
-
         {/* ── Рекомендации ── */}
         <section>
           <h2 className="mb-3 text-lg font-semibold text-fg">Рекомендации</h2>
@@ -106,10 +66,15 @@ export default function HomePage() {
                 <h3 className="mt-2 font-semibold text-fg">{r.title}</h3>
                 <p className="mt-1 flex-1 text-sm leading-relaxed text-muted">{r.desc}</p>
                 <div className="mt-4 flex items-center gap-2">
-                  <button className="btn-primary text-sm">
+                  <button onClick={() => setConnect(r.title)} className="btn-primary text-sm">
                     {r.cta} <IconArrowRight className="h-3.5 w-3.5" />
                   </button>
-                  <button className="btn-ghost text-sm">Демо</button>
+                  <button
+                    onClick={"demo" in r && r.demo ? () => setDemo(true) : undefined}
+                    className="btn-ghost text-sm"
+                  >
+                    Демо
+                  </button>
                   <span className="ml-auto text-[11px] text-faint">Подборка</span>
                 </div>
               </div>
@@ -119,7 +84,7 @@ export default function HomePage() {
 
         {/* ── Каталог ── */}
         <Link
-          href="#"
+          href="/catalog"
           className="flex items-center gap-4 rounded-xl2 border border-dashed border-line bg-ink-700/40 p-5 transition-colors hover:border-brand-purple/50"
         >
           <div>
@@ -143,42 +108,10 @@ export default function HomePage() {
           </div>
         </section>
       </div>
+
+      {demo && <QuarterReportDemo onClose={() => setDemo(false)} />}
+      {connect && <ConnectModal title={connect} onClose={() => setConnect(null)} />}
     </>
-  );
-}
-
-function NotificationCard({
-  n,
-  onClose,
-}: {
-  n: (typeof NOTIFICATIONS)[number];
-  onClose: () => void;
-}) {
-  const cfg = {
-    warn: { Icon: IconWarn, color: "text-amber-400", ring: "border-amber-500/25" },
-    info: { Icon: IconInfo, color: "text-brand-cyan", ring: "border-brand-cyan/25" },
-    ok: { Icon: IconCheckCircle, color: "text-emerald-400", ring: "border-emerald-500/25" },
-  }[n.kind];
-
-  return (
-    <div className={`card !p-4 ${cfg.ring} flex gap-3`}>
-      <span className={`mt-0.5 shrink-0 ${cfg.color}`}>
-        <cfg.Icon className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm leading-relaxed text-muted">{n.text}</p>
-        {"tag" in n && n.tag && (
-          <span className="pill mt-2 text-faint">{n.tag}</span>
-        )}
-      </div>
-      <button
-        onClick={onClose}
-        className="shrink-0 text-faint transition-colors hover:text-fg"
-        aria-label="Скрыть"
-      >
-        ✕
-      </button>
-    </div>
   );
 }
 

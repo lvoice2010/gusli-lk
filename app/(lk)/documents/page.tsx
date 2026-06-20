@@ -116,6 +116,7 @@ export default function DocumentsPage() {
   const [type, setType] = useState<"all" | DocType>("all");
   const [status, setStatus] = useState<"all" | DocStatus>("all");
   const [query, setQuery] = useState("");
+  const [view, setView] = useState<Doc | null>(null);
 
   const byYear = all.filter((d) => d.year === year);
 
@@ -236,7 +237,10 @@ export default function DocumentsPage() {
                       <span className={`pill ${STATUS_STYLE[d.status]}`}>{d.status}</span>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      <button className="btn-ghost !px-3 !py-1.5 text-xs">
+                      <button
+                        onClick={() => setView(d)}
+                        className="btn-ghost !px-3 !py-1.5 text-xs"
+                      >
                         <IconEye className="h-4 w-4" /> Посмотреть
                       </button>
                     </td>
@@ -259,7 +263,34 @@ export default function DocumentsPage() {
           раньше срока — напишите менеджеру.
         </p>
       </div>
+
+      {view && <DocViewer doc={view} onClose={() => setView(null)} />}
     </>
+  );
+}
+
+// Просмотр документа во всплывающем окне (демо — открывается пример счёта PDF)
+function DocViewer({ doc, onClose }: { doc: Doc; onClose: () => void }) {
+  const src = "/invoice-sample.pdf";
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-ink-800 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-4 border-b border-line p-4">
+          <div className="min-w-0">
+            <div className="truncate font-semibold text-fg">{doc.number}</div>
+            <div className="text-xs text-faint">{doc.period} · {doc.date}</div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <a href={src} download className="btn-ghost text-sm">Скачать</a>
+            <button onClick={onClose} className="btn-ghost !p-2" aria-label="Закрыть">✕</button>
+          </div>
+        </div>
+        <iframe src={src} title={doc.number} className="h-full w-full bg-white" />
+      </div>
+    </div>
   );
 }
 

@@ -43,7 +43,9 @@ export interface FunnelStep {
 export interface RoiData {
   aiClosedCount: number;
   avgHandleSec: number; // средняя длительность диалога ИИ
-  savedMinutes: number; // сэкономленные минуты оператора
+  talkMinutes: number; // разговорные минуты ИИ (чистое время в диалогах)
+  occupancy: number; // занятость оператора, 0..1 (на час оплаты — занятость×60 мин разговора)
+  savedMinutes: number; // оплачиваемое время оператора = talkMinutes / occupancy
   operatorRatePerHour: number; // ставка оператора, ₽/час
   dialogCost: number; // стоимость диалога ИИ, ₽
   savedMoney: number; // экономия за период, ₽

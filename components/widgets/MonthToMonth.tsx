@@ -2,12 +2,26 @@
 
 import { useState } from "react";
 import { fmtNumber } from "@/lib/format";
-import type { MonthStat } from "@/lib/mock";
+import { YEAR_STATS, type MonthStat } from "@/lib/mock";
+
+// «Сегодня» в прототипе — 19 июня, поэтому MTD = первые 19 из 30 дней месяца.
+const MTD_DAYS = 19;
+const MONTH_DAYS = 30;
 
 function mmss(sec: number) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
+// Масштабируем объёмные метрики месяца к доле прошедших дней (ставки и средние не трогаем)
+function toMtd(m: MonthStat, frac: number): MonthStat {
+  return {
+    ...m,
+    incoming: Math.round(m.incoming * frac),
+    aiHandled: Math.round(m.aiHandled * frac),
+    escalations: Math.round(m.escalations * frac),
+  };
 }
 
 // Дельта-подпись: рост/падение со стрелкой; good — хорошо ли это
@@ -20,21 +34,36 @@ function Delta({ text, up, good }: { text: string; up: boolean; good: boolean })
   );
 }
 
-export function MonthToMonth({
-  current,
-  previous,
-  currentLabel,
-  previousLabel,
-}: {
-  current: MonthStat;
-  previous: MonthStat;
-  currentLabel: string;
-  previousLabel: string;
-}) {
+export function MonthToMonth() {
   const [mode, setMode] = useState<"closed" | "mtd">("closed");
 
+  const y26 = YEAR_STATS["2026"];
+
+  let current: MonthStat;
+  let previous: MonthStat;
+  let currentLabel: string;
+  let previousLabel: string;
+  let note: string;
+
+  if (mode === "mtd") {
+    // Текущий месяц на тек. дату vs прошлый месяц за те же даты (1–19)
+    const frac = MTD_DAYS / MONTH_DAYS;
+    current = y26[y26.length - 1]; // Июнь 2026, данные уже на тек. дату
+    previous = toMtd(y26[y26.length - 2], frac); // Май 2026 за те же даты (1–19)
+    currentLabel = `Июнь (1–${MTD_DAYS})`;
+    previousLabel = `Май (1–${MTD_DAYS})`;
+    note = `Сравнение текущего месяца за ${MTD_DAYS} дней с тем же окном предыдущего месяца (1–${MTD_DAYS} мая) — чтобы числа были сопоставимы.`;
+  } else {
+    // Последние завершённые месяцы — месяц к месяцу
+    current = y26[y26.length - 2]; // Май
+    previous = y26[y26.length - 3]; // Апрель
+    currentLabel = "Май";
+    previousLabel = "Апрель";
+    note = "Сравнение последних завершённых месяцев — май к апрелю (текущий июнь ещё идёт).";
+  }
+
   const pctDelta = (c: number, p: number) => {
-    const d = ((c - p) / p) * 100;
+    const d = p ? ((c - p) / p) * 100 : 0;
     return { text: `${d > 0 ? "+" : ""}${d.toFixed(1)}%`, up: d >= 0 };
   };
 
@@ -71,6 +100,15 @@ export function MonthToMonth({
     },
   ];
 
+  const prevVals = [
+    fmtNumber(previous.incoming),
+    fmtNumber(previous.aiHandled),
+    fmtNumber(previous.escalations),
+    `${previous.escalationRate.toFixed(1)}%`,
+    mmss(previous.avgDialogSec),
+    fmtNumber(prevMinutes),
+  ];
+
   return (
     <div>
       <div className="mb-4 flex justify-end">
@@ -88,6 +126,7 @@ export function MonthToMonth({
           ))}
         </div>
       </div>
+      <p className="mb-3 text-xs text-faint">{note}</p>
       <table className="w-full text-sm">
         <thead>
           <tr className="text-xs uppercase tracking-wide text-faint">
@@ -98,26 +137,16 @@ export function MonthToMonth({
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => {
-            const prevVal = [
-              fmtNumber(previous.incoming),
-              fmtNumber(previous.aiHandled),
-              fmtNumber(previous.escalations),
-              `${previous.escalationRate.toFixed(1)}%`,
-              mmss(previous.avgDialogSec),
-              fmtNumber(prevMinutes),
-            ][i];
-            return (
-              <tr key={r.label} className="border-t border-line/50">
-                <td className="py-2.5 text-muted">{r.label}</td>
-                <td className="py-2.5 text-right font-semibold text-fg">{r.c}</td>
-                <td className="py-2.5 text-right text-faint">{prevVal}</td>
-                <td className="py-2.5 text-right">
-                  <Delta text={r.d.text} up={r.d.up} good={r.d.up === r.goodUp} />
-                </td>
-              </tr>
-            );
-          })}
+          {rows.map((r, i) => (
+            <tr key={r.label} className="border-t border-line/50">
+              <td className="py-2.5 text-muted">{r.label}</td>
+              <td className="py-2.5 text-right font-semibold text-fg">{r.c}</td>
+              <td className="py-2.5 text-right text-faint">{prevVals[i]}</td>
+              <td className="py-2.5 text-right">
+                <Delta text={r.d.text} up={r.d.up} good={r.d.up === r.goodUp} />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

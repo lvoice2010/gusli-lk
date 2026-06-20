@@ -7,7 +7,7 @@ type Theme = "dark" | "light";
 
 // Тумблер тёмная/светлая тема. Состояние пишется в data-theme на <html> и в localStorage.
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     const saved = (document.documentElement.getAttribute("data-theme") as Theme) || "dark";

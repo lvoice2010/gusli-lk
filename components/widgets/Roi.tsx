@@ -22,7 +22,7 @@ export function Roi({ data }: { data: RoiData }) {
             {hours} ч {mins} мин
           </div>
           <div className="mt-1 text-[11px] text-faint">
-            {fmtNumber(data.savedMinutes)} мин суммарно
+            {fmtNumber(data.talkMinutes)} мин разговора ÷ занятость {Math.round(data.occupancy * 100)}%
           </div>
         </div>
       </div>
@@ -30,12 +30,16 @@ export function Roi({ data }: { data: RoiData }) {
       <ul className="mt-4 space-y-2.5 text-sm">
         <Row label="Обращений закрыто ИИ" value={fmtNumber(data.aiClosedCount)} />
         <Row label="Средняя длительность диалога" value={fmtDuration(data.avgHandleSec)} />
+        <Row label="Разговорных минут ИИ" value={fmtNumber(data.talkMinutes)} />
+        <Row label="Занятость оператора" value={`${Math.round(data.occupancy * 100)}%`} />
         <Row label="Стоимость одного диалога ИИ" value={fmtMoney(data.dialogCost)} />
       </ul>
 
       <p className="mt-4 rounded-lg border border-line bg-ink-600/40 p-3 text-xs leading-relaxed text-faint">
-        Расчёт: закрытые ИИ обращения × средняя длительность = сэкономленные минуты
-        оператора, переведённые в деньги по вашей ставке из настроек.
+        Расчёт: разговорные минуты ИИ ÷ занятость оператора ({Math.round(data.occupancy * 100)}%) =
+        оплачиваемые часы оператора × ставка {fmtMoney(data.operatorRatePerHour)}/час. Оператор не
+        загружен на 100%: на час оплаты приходится ~{Math.round(data.occupancy * 60)} мин разговора,
+        остальное — ожидание и переключения.
       </p>
     </div>
   );

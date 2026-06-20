@@ -18,13 +18,18 @@ export function RoiPanel() {
   const aiClosedCount = slice.reduce((s, m) => s + m.aiHandled, 0);
   const totalSec = slice.reduce((s, m) => s + m.aiHandled * m.avgDialogSec, 0);
   const avgHandleSec = aiClosedCount ? Math.round(totalSec / aiClosedCount) : 0;
-  const savedMinutes = Math.round(totalSec / 60);
+  const talkMinutes = Math.round(totalSec / 60); // чистые разговорные минуты ИИ
+  const occupancy = CLIENT.operatorOccupancy;
+  // Оператору нужно больше оплачиваемого времени: занятость < 100%
+  const savedMinutes = Math.round(talkMinutes / occupancy);
   const savedMoney = Math.round((savedMinutes / 60) * CLIENT.operatorRatePerHour);
   const dialogCost = +((avgHandleSec / 60) * BILLING.ratePerMin).toFixed(1);
 
   const roi: RoiData = {
     aiClosedCount,
     avgHandleSec,
+    talkMinutes,
+    occupancy,
     savedMinutes,
     operatorRatePerHour: CLIENT.operatorRatePerHour,
     dialogCost,

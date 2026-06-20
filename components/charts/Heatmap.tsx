@@ -21,12 +21,25 @@ function fmtCell(n: number): string {
   return n >= 1000 ? (n / 1000).toFixed(1).replace(".0", "") + "k" : String(n);
 }
 
-// Базовый профиль будня (звонков/час): пик в обед (~12) и вечерний всплеск (~19)
-const WEEKDAY = [2, 2, 1, 1, 0, 0, 1, 13, 15, 55, 76, 92, 98, 92, 76, 55, 38, 28, 30, 45, 27, 22, 17, 12];
-const DAY_MULT = [0.97, 1.05, 1.05, 0.97, 0.9, 0.52, 0.56];
+// Базовый профиль звонков по часам (00–23): ночью тихо, в 03–05 звонков нет,
+// обеденный пик (~13) и вечерний всплеск (~19–20) — типично для ресторана.
+const WEEKDAY = [5, 3, 2, 0, 0, 0, 3, 7, 14, 26, 44, 66, 90, 96, 78, 56, 42, 52, 74, 92, 86, 62, 36, 18];
+// Множитель по дням недели (Пн…Вс): пятница — пик, воскресенье — потише
+const DAY_MULT = [0.92, 0.97, 1.0, 1.05, 1.18, 1.08, 0.85];
+
+// Детерминированный «шум» 0..1 по ячейке (день×час) — чтобы числа не были
+// одинаковыми. На базе sin (без Math.random): одинаков на сервере и клиенте.
+function jitter(day: number, hour: number): number {
+  const s = Math.sin(day * 12.9898 + hour * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+}
 
 function callsAt(day: number, hour: number): number {
-  return Math.round(WEEKDAY[hour] * DAY_MULT[day]);
+  const base = WEEKDAY[hour];
+  if (base === 0) return 0; // 03–05 и т.п. — звонков нет
+  // ±22% разброса по ячейке поверх дневного множителя
+  const v = base * DAY_MULT[day] * (0.78 + 0.44 * jitter(day, hour));
+  return Math.max(1, Math.round(v));
 }
 
 // Цветовая шкала как на референсе: teal → cyan → blue → indigo → purple → magenta
@@ -54,7 +67,10 @@ function colorFor(t: number): string {
   return `rgb(${last[0]},${last[1]},${last[2]})`;
 }
 
-const MAX = Math.max(...WEEKDAY.map((v) => v * Math.max(...DAY_MULT)));
+// Максимум по всем ячейкам (с учётом шума) — для нормировки цвета
+const MAX = Math.max(
+  ...DAYS.flatMap((_, d) => HOURS.map((h) => callsAt(d, h)))
+);
 
 export function Heatmap() {
   const [range, setRange] = useState<RangeKey>("week");

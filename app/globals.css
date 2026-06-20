@@ -67,6 +67,16 @@ body {
   background: var(--faint);
 }
 
+/* Эквалайзер веб-звонка (тест ассистента) */
+@keyframes sndbar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.eqbar {
+  transform-origin: center;
+  animation: sndbar 0.9s ease-in-out infinite;
+}
+
 @layer components {
   .card {
     @apply rounded-xl2 border border-line bg-ink-700/70 p-5 shadow-card backdrop-blur-sm;
@@ -87,7 +97,7 @@ body {
     @apply btn bg-brand-gradient text-white hover:opacity-90;
   }
   .btn-ghost {
-    @apply btn border border-line bg-ink-600/60 text-muted hover:text-white hover:border-brand-purple/50;
+    @apply btn border border-line bg-ink-600/60 text-muted hover:text-fg hover:border-brand-purple/50;
   }
 }
 

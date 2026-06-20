@@ -52,9 +52,24 @@ export function IntegrationsPanel() {
   );
 }
 
+// Лента последних действий ассистента в Restoplace (демо)
+const RECENT_ACTIONS: { time: string; type: string; text: string; tone: "create" | "move" | "cancel" | "read" }[] = [
+  { time: "14:32", type: "Бронь", text: "4 гостя, сегодня 19:00 · стол 12", tone: "create" },
+  { time: "13:58", type: "Перенос", text: "бронь Иванова: 20:00 → 21:00", tone: "move" },
+  { time: "12:10", type: "Отмена", text: "бронь на 2 гостей · стол 7", tone: "cancel" },
+  { time: "11:47", type: "Бронь", text: "2 гостя, завтра 13:30", tone: "create" },
+  { time: "10:05", type: "Проверка", text: "наличие столов на пятницу", tone: "read" },
+];
+
+const TONE: Record<string, string> = {
+  create: "border-emerald-500/30 text-emerald-400",
+  move: "border-brand-cyan/30 text-brand-cyan",
+  cancel: "border-rose-500/30 text-rose-400",
+  read: "border-line text-faint",
+};
+
 export function Integrations({ items }: { items: IntegrationStatus[] }) {
   const connected = items.filter((i) => i.connected);
-  const available = items.filter((i) => !i.connected);
 
   return (
     <div className="space-y-4">
@@ -79,26 +94,22 @@ export function Integrations({ items }: { items: IntegrationStatus[] }) {
         ))}
       </div>
 
-      {available.length > 0 && (
+      {connected.length > 0 && (
         <div>
-          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">
-            Доступно для подключения
+          <div className="mb-2.5 text-xs font-medium uppercase tracking-wide text-faint">
+            Последние действия ассистента
           </div>
-          <div className="flex flex-wrap gap-2">
-            {available.map((it) => (
-              <span
-                key={it.name}
-                className="pill border-dashed text-faint"
-                title={`Появится после подключения интеграции «${it.name}»`}
-              >
-                <span className="h-2 w-2 rounded-full bg-faint/50" />
-                {it.name} · {it.system}
-              </span>
+          <ul className="space-y-2">
+            {RECENT_ACTIONS.map((a, i) => (
+              <li key={i} className="flex items-center gap-2.5 text-sm">
+                <span className="w-10 shrink-0 tabular-nums text-faint">{a.time}</span>
+                <span className={`pill shrink-0 ${TONE[a.tone]}`}>{a.type}</span>
+                <span className="min-w-0 flex-1 truncate text-muted">{a.text}</span>
+                <IconCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+              </li>
             ))}
-          </div>
-          <p className="mt-2 text-xs text-faint">
-            Действия в этих системах появятся в статистике после подключения интеграции.
-          </p>
+          </ul>
+          <div className="mt-2 text-[11px] text-faint">Последние операции в Restoplace.</div>
         </div>
       )}
     </div>

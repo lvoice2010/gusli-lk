@@ -15,10 +15,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
-        {/* Применяем сохранённую тему до первой отрисовки — без мигания */}
+        {/* Тема по умолчанию — светлая; тёмная только если выбрана явно. Применяем до отрисовки — без мигания */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='dark')document.documentElement.setAttribute('data-theme','light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`,
           }}
         />
       </head>

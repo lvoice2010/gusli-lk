@@ -65,6 +65,7 @@ export function YearTable() {
               {MONTHS_RU.map((m) => (
                 <th
                   key={m}
+                  title={m === currentMonthLabel ? "Текущий месяц — данные на сегодняшнюю дату, не завершён" : undefined}
                   className={`pb-2 text-right font-medium ${m === currentMonthLabel ? "text-emerald-400" : ""}`}
                 >
                   {m}
@@ -95,6 +96,13 @@ export function YearTable() {
           </tbody>
         </table>
       </div>
+
+      {year === "2026" && currentMonthLabel && (
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-faint">
+          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          {currentMonthLabel} — текущий месяц, данные на сегодняшнюю дату (месяц ещё не завершён)
+        </div>
+      )}
 
       <div className="mt-4 rounded-xl border border-brand-purple/25 bg-brand-soft p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-brand-purple">

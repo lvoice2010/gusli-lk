@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { monthToPay } from "@/lib/mock";
 import { fmtMoney } from "@/lib/format";
-import { IconBell, IconFinance, IconWarn, IconArrowRight } from "./icons";
+import { IconFinance, IconWarn, IconArrowRight } from "./icons";
+import { useMobileNav } from "./MobileNavContext";
 
 export function Topbar({
   title,
@@ -16,10 +19,21 @@ export function Topbar({
 }) {
   const toPay = monthToPay(); // к оплате за месяц: минуты × тариф + сопровождение
   const hasDebt = toPay > 0; // есть задолженность — подсвечиваем в шапке
+  const { setOpen } = useMobileNav();
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-ink-900/70 backdrop-blur-md">
-      <div className="flex items-center gap-4 px-6 py-4">
+      <div className="flex items-center gap-3 px-4 py-4 sm:gap-4 sm:px-6">
+        {/* Бургер — открыть меню (моб.) */}
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Меню"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-line text-muted transition-colors hover:text-fg lg:hidden"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+          </svg>
+        </button>
         <div className="min-w-0">
           {back && (
             <Link
@@ -37,27 +51,15 @@ export function Topbar({
           <span
             className={`pill font-semibold ${
               hasDebt
-                ? "border-amber-500/40 bg-amber-500/10 text-amber-400"
+                ? "border-transparent bg-amber-500 text-white shadow-sm"
                 : "border-brand-purple/40 text-fg"
             }`}
             title={hasDebt ? "Задолженность к оплате" : "Баланс"}
           >
-            {hasDebt ? (
-              <IconWarn className="h-4 w-4" />
-            ) : (
-              <IconFinance className="h-4 w-4 text-brand-cyan" />
-            )}
-            {fmtMoney(toPay)}
+            <IconFinance className={`h-4 w-4 ${hasDebt ? "text-white" : "text-brand-cyan"}`} />
+            {hasDebt ? "−" : ""}{fmtMoney(toPay)}
+            {hasDebt && <IconWarn className="h-4 w-4" />}
           </span>
-          <button
-            className="relative grid h-9 w-9 place-items-center rounded-xl border border-line bg-ink-700/70 text-muted transition-colors hover:text-fg"
-            aria-label="Уведомления"
-          >
-            <IconBell className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-brand-gradient text-[10px] font-bold text-white">
-              3
-            </span>
-          </button>
         </div>
       </div>
     </header>

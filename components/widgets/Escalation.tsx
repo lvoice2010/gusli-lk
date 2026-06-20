@@ -10,28 +10,28 @@ export function Escalation({ data }: { data: ReportData["escalation"] }) {
   return (
     <div>
       {/* Сплит-бар ИИ vs оператор */}
-      <div className="flex h-12 overflow-hidden rounded-xl border border-line">
+      <div className="flex h-14 overflow-hidden rounded-xl border border-line">
         <div
-          className="flex items-center justify-center bg-gradient-to-r from-brand-purple to-brand-indigo text-sm font-semibold text-white"
+          className="flex items-center justify-center bg-gradient-to-r from-brand-purple to-brand-indigo text-2xl font-bold text-white"
           style={{ width: `${aiPct}%` }}
         >
           {Math.round(aiPct)}%
         </div>
         <div
-          className="flex items-center justify-center bg-ink-500 text-sm font-semibold text-amber-300"
+          className="flex items-center justify-center bg-ink-500 text-2xl font-bold text-amber-300"
           style={{ width: `${escPct}%` }}
         >
           {escPct >= 8 ? `${Math.round(escPct)}%` : ""}
         </div>
       </div>
-      <div className="mt-2 flex justify-between text-xs">
+      <div className="mt-2.5 flex justify-between text-sm">
         <span className="flex items-center gap-1.5 text-muted">
-          <span className="h-2 w-2 rounded-sm bg-brand-purple" /> Закрыл ИИ ·{" "}
-          <span className="font-semibold text-fg">{fmtNumber(data.aiClosed)}</span>
+          <span className="h-2.5 w-2.5 rounded-sm bg-brand-purple" /> Закрыл ИИ ·{" "}
+          <span className="text-base font-bold text-fg">{fmtNumber(data.aiClosed)}</span>
         </span>
         <span className="flex items-center gap-1.5 text-muted">
-          <span className="h-2 w-2 rounded-sm bg-amber-300" /> Передано оператору ·{" "}
-          <span className="font-semibold text-fg">{fmtNumber(data.escalated)}</span>
+          <span className="h-2.5 w-2.5 rounded-sm bg-amber-300" /> Передано оператору ·{" "}
+          <span className="text-base font-bold text-fg">{fmtNumber(data.escalated)}</span>
         </span>
       </div>
 

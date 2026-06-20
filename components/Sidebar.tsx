@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { SkolkovoBadge } from "./SkolkovoBadge";
 import { ThemeToggle } from "./ThemeToggle";
+import { useMobileNav } from "./MobileNavContext";
 import { CLIENT, CONNECTED_ASSISTANTS } from "@/lib/mock";
 import {
   IconHome,
   IconDashboard,
   IconDoc,
   IconMail,
+  IconSparkle,
 } from "./icons";
 
 type IconCmp = (p: { className?: string }) => JSX.Element;
@@ -32,10 +34,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function NavItem({ href, label, Icon }: { href: string; label: string; Icon: IconCmp }) {
   const pathname = usePathname();
+  const { setOpen } = useMobileNav();
   const active = pathname === href || pathname.startsWith(href + "/");
   return (
     <Link
       href={href}
+      onClick={() => setOpen(false)}
       className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
         active
           ? "bg-brand-soft text-fg shadow-[inset_0_0_0_1px_rgba(139,92,246,0.35)]"
@@ -59,7 +63,9 @@ function NavItem({ href, label, Icon }: { href: string; label: string; Icon: Ico
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { open, setOpen } = useMobileNav();
   const onDashboard = pathname.startsWith("/dashboard");
+  const onCatalog = pathname.startsWith("/catalog");
   const initials = CLIENT.contactName
     .split(" ")
     .map((w) => w[0])
@@ -67,7 +73,19 @@ export function Sidebar() {
     .slice(0, 2);
 
   return (
-    <aside className="sidebar fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-line bg-ink-800/95 backdrop-blur-md">
+    <>
+      {/* Затемнение под выезжающим меню (моб.) */}
+      {open && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm lg:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      <aside
+        className={`sidebar fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-line bg-ink-800/95 backdrop-blur-md transition-transform duration-200 lg:translate-x-0 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
       <div className="px-5 pb-3 pt-2">
         <Logo />
       </div>
@@ -82,7 +100,8 @@ export function Sidebar() {
         <div>
           <SectionLabel>Ассистенты</SectionLabel>
           <div className="space-y-1">
-            {CONNECTED_ASSISTANTS.map((a) => {
+            {/* SMS-рассылки пока скрыты из меню */}
+            {CONNECTED_ASSISTANTS.filter((a) => a.id !== "sms").map((a) => {
               const launching = a.status === "launching";
               // Активный ассистент подсвечивается, когда открыт его дашборд
               const active = onDashboard && !launching;
@@ -90,6 +109,7 @@ export function Sidebar() {
                 <Link
                   key={a.id}
                   href="/dashboard"
+                  onClick={() => setOpen(false)}
                   className={`group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all ${
                     active
                       ? "bg-brand-soft text-fg shadow-[inset_0_0_0_1px_rgba(139,92,246,0.3)]"
@@ -118,6 +138,18 @@ export function Sidebar() {
           </div>
         </div>
 
+        {/* Витрина услуг — выделенный пункт */}
+        <Link
+          href="/catalog"
+          onClick={() => setOpen(false)}
+          className={`group flex items-center gap-3 rounded-xl bg-brand-gradient px-3.5 py-3 text-sm font-semibold text-white shadow-glow transition-opacity hover:opacity-90 ${
+            onCatalog ? "opacity-100" : ""
+          }`}
+        >
+          <IconSparkle className="h-5 w-5 shrink-0" />
+          <span className="leading-tight">Витрина всех продуктов и услуг</span>
+        </Link>
+
       </nav>
 
       <div className="space-y-2.5 p-3">
@@ -138,6 +170,7 @@ export function Sidebar() {
           </div>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
