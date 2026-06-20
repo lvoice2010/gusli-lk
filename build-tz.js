@@ -56,7 +56,10 @@ const children = [];
 children.push(new Paragraph({ alignment: AlignmentType.LEFT, spacing: { after: 60 }, children: [new TextRun({ text: "Техническое задание", bold: true, size: 44 })] }));
 children.push(new Paragraph({ spacing: { after: 40 }, children: [new TextRun({ text: "Личный кабинет клиента «КиберГусли»", size: 30, color: "444444" })] }));
 children.push(P([t("Документ описывает логику отображения клиентского ЛК и какие данные он ожидает от систем заказчика. Настройку передачи данных (интеграции с EngineGusli/ai_admin2, CRM, биллингом, ЭДО) разработчик реализует на своей стороне — здесь только что и в какой логике выводить, за какие периоды, по каким формулам, и что приходит из админского/менеджерского кабинета.")]));
-children.push(P([b("Версия: "), t("прототип на мок-данных. Адрес демо: https://gusli-lk.vercel.app")]));
+children.push(P([b("Ресурсы и доступы:")]));
+children.push(bullet([b("Прототип (демо на Vercel): "), t("https://gusli-lk.vercel.app")]));
+children.push(bullet([b("Исходный код (Git-репозиторий): "), t("https://github.com/lvoice2010/gusli-lk — доступ на клонирование выдаётся команде разработки.")]));
+children.push(bullet([b("Версия: "), t("прототип на мок-данных (фронтенд на Next.js; данные демонстрационные).")]));
 children.push(new Paragraph({ children: [new PageBreak()] }));
 
 // ===== 0 =====
