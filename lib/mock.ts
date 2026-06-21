@@ -25,7 +25,7 @@ export const CLIENT = {
 // Биллинг: оплата по факту по минутам + ежемесячное сопровождение
 export const BILLING = {
   ratePerMin: 13.5, // ₽/мин
-  supportPerMonth: 14800, // ₽/мес — сопровождение
+  supportPerMonth: 13800, // ₽/мес — сопровождение
   monthMinutes: 4880, // минут за текущий месяц
 };
 
