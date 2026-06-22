@@ -17,7 +17,7 @@ export const CLIENT = {
   contactName: "Анна Иванова",
   serviceName: "Входящая линия «Рыба моя»",
   assistantName: "Входящая Линия «Рыба моя»",
-  manager: { name: "Юля Головина", phone: "+7 999 123-45-67", email: "y.golovina@cybergusli.ru" },
+  manager: { name: "Юля Головина", phone: "+7 963 383-25-53", email: "y.golovina@cybergusli.ru" },
   operatorRatePerHour: 350, // ₽/час — из настроек, для расчёта ROI
   operatorOccupancy: 0.7, // занятость оператора: ~70% часа в разговоре, остальное — ожидание
 };
