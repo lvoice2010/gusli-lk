@@ -271,7 +271,8 @@ export default function DocumentsPage() {
 
 // Просмотр документа во всплывающем окне (демо — открывается пример счёта PDF)
 function DocViewer({ doc, onClose }: { doc: Doc; onClose: () => void }) {
-  const src = "/invoice-sample.pdf";
+  // Демо-файлы: акт → УПД, остальное → счёт
+  const src = doc.type === "Акт" ? "/act-sample.pdf" : "/invoice-sample.pdf";
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
       <div
