@@ -39,6 +39,7 @@ export default function ReportsPage() {
   const all = useMemo(() => REPORTS, []);
   const [type, setType] = useState<"all" | RepType>("all");
   const [year, setYear] = useState<"all" | Year>("all");
+  const [view, setView] = useState<Report | null>(null);
 
   const rows = all.filter((r) => {
     if (type !== "all" && r.type !== type) return false;
@@ -115,12 +116,12 @@ export default function ReportsPage() {
                     <td className="px-5 py-3">
                       {r.status === "ready" ? (
                         <div className="flex items-center justify-end gap-2">
-                          <button className="btn-ghost !px-3 !py-1.5 text-xs">
+                          <button onClick={() => setView(r)} className="btn-ghost !px-3 !py-1.5 text-xs">
                             <IconEye className="h-4 w-4" /> Посмотреть
                           </button>
-                          <button className="btn-primary !px-3 !py-1.5 text-xs">
+                          <a href="/report-sample.pdf" download className="btn-primary !px-3 !py-1.5 text-xs">
                             <IconDownload className="h-4 w-4" /> Скачать
-                          </button>
+                          </a>
                         </div>
                       ) : (
                         <div className="flex justify-end">
@@ -147,7 +148,34 @@ export default function ReportsPage() {
           закрытия квартала.
         </p>
       </div>
+
+      {view && <ReportViewer report={view} onClose={() => setView(null)} />}
     </>
+  );
+}
+
+// Просмотр отчёта во всплывающем окне (демо — пример отчёта PDF)
+function ReportViewer({ report, onClose }: { report: Report; onClose: () => void }) {
+  const src = "/report-sample.pdf";
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-line bg-ink-800 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-4 border-b border-line p-4">
+          <div className="min-w-0">
+            <div className="truncate font-semibold text-fg">{report.type} отчёт · {report.period}</div>
+            <div className="text-xs text-faint">{report.service} · опубликован {report.published}</div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <a href={src} download className="btn-ghost text-sm">Скачать</a>
+            <button onClick={onClose} className="btn-ghost !p-2" aria-label="Закрыть">✕</button>
+          </div>
+        </div>
+        <iframe src={src} title={report.period} className="h-full w-full bg-white" />
+      </div>
+    </div>
   );
 }
 
